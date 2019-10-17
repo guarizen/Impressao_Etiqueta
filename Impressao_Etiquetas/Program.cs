@@ -4,6 +4,9 @@ using System.IO;
 using System.Drawing.Printing;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+using System.Drawing.Imaging;
+using System.Drawing;
+using System.Drawing.Drawing2D;
 
 namespace Impressao_Etiquetas
 {
@@ -30,6 +33,7 @@ namespace Impressao_Etiquetas
                 Console.WriteLine("Aguardando Retorno do Millennium...");
                 using (var resposta = requisicaoWeb.GetResponse())
                 {
+                    Console.WriteLine("Retorno OK...");
                     var streamDados = resposta.GetResponseStream();
                     StreamReader reader = new StreamReader(streamDados);
                     object objResponse = reader.ReadToEnd();
@@ -37,10 +41,15 @@ namespace Impressao_Etiquetas
 
                     ListaRecebimento Receb = JsonConvert.DeserializeObject<ListaRecebimento>(objResponse.ToString());
 
-                    Console.WriteLine("Processando...");
+
+                    Console.WriteLine("Processando Produtos...");
                     foreach (var reb in Receb.Value)
                     {
-                        //Lista de API criar foreach()
+                        byte[] textoByte = System.Text.Encoding.UTF8.GetBytes(reb.Foto);
+                        string texto64 = Convert.ToBase64String(textoByte);
+                        var img = Image.FromStream(new MemoryStream(Convert.FromBase64String(texto64)));
+
+
                         string s = "^XA" +
                                    "^CF0,30" +
                                    "^FO10,40^FDPILLOWTEX IND. COM. TEXTIL - LTDA^FS" +
@@ -62,6 +71,7 @@ namespace Impressao_Etiquetas
                         {
                             PrintDialog pd = new PrintDialog();
                             pd.PrinterSettings = new PrinterSettings();
+                            Console.WriteLine("Imprimindo...");
                             RawPrinterHelper.SendStringToPrinter(pd.PrinterSettings.PrinterName, s);
                         }
                         

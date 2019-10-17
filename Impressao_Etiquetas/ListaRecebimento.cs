@@ -44,6 +44,9 @@ namespace Impressao_Etiquetas
 
         [JsonProperty("quantidade")]
         public long Quantidade { get; set; }
+
+        [JsonProperty("foto")]
+        public string Foto { get; set; }
     }
 
     public partial class ListaRecebimento
